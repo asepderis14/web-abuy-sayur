@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abuy Sayur - Segar & Halal</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo">
+            <div class="logo-text">ABUY SAYUR</div>
+        </div>
+        <div class="nav-links">
+            <span id="cart-count" onclick="toggleCart()">🛒 0</span>
+            <a href="login.html" class="btn-admin" style="background:var(--primary-dark); color:white; padding:5px 10px; border-radius:5px;">Admin</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Cari sayur, buah, atau bumbu...">
+        </div>
+        <div id="product-list" class="grid-container"></div>
+    </div>
+
+    <div id="cart-modal" style="display:none;">
+        <h3>Pesanan Anda</h3>
+        <div id="cart-items" style="max-height: 200px; overflow-y: auto;"></div>
+        <textarea id="order-note" placeholder="Contoh: Level pedas, jangan layu, kirim sore..."></textarea>
+        <p>Total: <strong id="cart-total">Rp 0</strong></p>
+        <button onclick="checkout()">Pesan Sekarang</button>
+        <button class="btn-danger" onclick="toggleCart()" style="margin-top:8px">Tutup</button>
+    </div>
+
+    <script type="module" src="js/shop.js"></script>
+</body>
+</html>

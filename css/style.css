@@ -1,0 +1,61 @@
+:root {
+    --primary-dark: #1a4a7a;
+    --primary-light: #4a90e2;
+    --accent-green: #7dbf21;
+    --bg-light: #f4f7f9;
+    --text-dark: #2c3e50;
+    --white: #ffffff;
+    --danger: #e74c3c;
+}
+
+* { box-sizing: border-box; }
+body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg-light); color: var(--text-dark); }
+
+/* Navigation */
+nav {
+    background: var(--white); padding: 10px 15px; display: flex;
+    justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-bottom: 3px solid var(--primary-dark);
+    position: sticky; top: 0; z-index: 1000;
+}
+.logo-container { display: flex; align-items: center; gap: 8px; }
+.logo-container img { height: 40px; width: 40px; border-radius: 50%; object-fit: cover; }
+.logo-text { font-weight: 800; font-size: 1.1rem; color: var(--primary-dark); }
+
+/* Responsive Grid */
+.container { padding: 15px; max-width: 1100px; margin: auto; }
+.grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
+
+@media (min-width: 768px) {
+    .grid-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+    .logo-text { font-size: 1.4rem; }
+}
+
+/* Card Produk */
+.card { background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border-bottom: 3px solid var(--primary-light); }
+.card img { width: 100%; height: 140px; object-fit: cover; }
+.card-content { padding: 10px; text-align: center; }
+.card h4 { margin: 5px 0; font-size: 0.95rem; color: var(--primary-dark); }
+.card p { color: var(--accent-green); font-weight: 800; font-size: 1rem; margin: 5px 0; }
+
+/* Buttons */
+button { background: var(--accent-green); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+button:hover { opacity: 0.9; }
+.btn-danger { background: var(--danger); }
+
+/* Search Box */
+.search-box input { width: 100%; padding: 12px 20px; border-radius: 25px; border: 2px solid var(--primary-light); outline: none; }
+
+/* Modal Cart (Slide Up for Mobile) */
+#cart-modal {
+    position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 20px;
+    border-radius: 20px 20px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); z-index: 2000;
+}
+@media (min-width: 768px) {
+    #cart-modal { top: 50%; bottom: auto; left: 50%; transform: translate(-50%, -50%); width: 400px; border-radius: 15px; }
+}
+
+/* Login Page */
+.login-body { background: linear-gradient(135deg, var(--primary-dark), var(--primary-light)); height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.login-card { background: white; width: 100%; max-width: 380px; padding: 30px; border-radius: 20px; text-align: center; }
+.login-card input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; }

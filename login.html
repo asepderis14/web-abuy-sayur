@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - Abuy Sayur</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-body">
+    <div class="login-card">
+        <img src="logo.png" style="width:70px; margin-bottom:10px;">
+        <h2>Admin Access</h2>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="Email Admin" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" id="btn-login">Masuk</button>
+        </form>
+        <p id="error-msg" style="color:red; font-size:0.8rem; margin-top:10px;"></p>
+        <a href="index.html" style="text-decoration:none; color:#888; font-size:0.8rem; display:block; margin-top:15px;">← Kembali ke Toko</a>
+    </div>
+
+    <script type="module">
+        import { auth } from './js/firebase-config.js';
+        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        document.getElementById('login-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login');
+            btn.innerText = "Processing...";
+            try {
+                await signInWithEmailAndPassword(auth, email.value, password.value);
+                location.href = 'admin-menu.html';
+            } catch (err) {
+                document.getElementById('error-msg').innerText = "Login Gagal!";
+                btn.innerText = "Masuk";
+            }
+        };
+    </script>
+</body>
+</html>

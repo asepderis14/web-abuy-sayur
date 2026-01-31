@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Kelola Menu</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">ADMIN PANEL</div>
+        <div>
+            <a href="admin-pesanan.html">Pesanan</a>
+            <button id="logout" style="width:auto; background:red">Keluar</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-box">
+            <h3>Tambah Menu Baru</h3>
+            <form id="menu-form">
+                <input type="text" id="name" placeholder="Nama Menu" required>
+                <input type="number" id="price" placeholder="Harga" required>
+                <input type="file" id="image" accept="image/*" required>
+                <button type="submit" id="btn-save">Simpan ke Database</button>
+            </form>
+        </div>
+
+        <div id="menu-list" class="grid-container"></div>
+    </div>
+
+    <script type="module" src="js/admin-menu.js"></script>
+</body>
+</html>
