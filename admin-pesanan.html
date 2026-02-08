@@ -2,22 +2,52 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Abuy Sayur - Monitor Pesanan</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Pesanan - Abuy Sayur</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --navy: #003366; --teal: #00b894; --red: #e74c3c; --orange: #f39c12; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; }
+        
+        nav { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .nav-links a { text-decoration: none; color: var(--navy); font-weight: bold; margin-right: 20px; }
+        
+        .container { padding: 30px 5%; max-width: 900px; margin: auto; }
+        h2 { color: var(--navy); border-left: 5px solid var(--navy); padding-left: 15px; }
+
+        .order-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 8px solid #ccc; transition: 0.3s; }
+        .status-baru { border-left-color: var(--red); }
+        .status-proses { border-left-color: var(--orange); }
+        .status-selesai { border-left-color: var(--teal); }
+
+        .btn-action { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; color: white; transition: 0.2s; }
+        .btn-proses { background: var(--orange); }
+        .btn-selesai { background: var(--teal); }
+        .btn-hapus { background: none; color: #999; border: 1px solid #ddd; }
+        .btn-hapus:hover { color: var(--red); border-color: var(--red); }
+
+        .item-list { background: #f9f9f9; padding: 10px 15px; border-radius: 8px; margin: 15px 0; }
+        .item-list ul { margin: 0; padding-left: 20px; }
+        .item-list li { font-size: 0.9rem; margin-bottom: 5px; }
+    </style>
 </head>
 <body>
-    <nav>
-        <div class="logo-container">
-            <div class="logo-text">PESANAN MASUK</div>
-        </div>
-        <div class="nav-links">
-            <a href="admin-menu.html">Kelola Menu</a>
-            <button onclick="location.href='index.html'" class="btn-danger">Keluar</button>
-        </div>
-    </nav>
-    <div class="container">
-        <div id="order-list"></div>
+
+<nav>
+    <div style="font-weight: bold; font-size: 1.2rem; color: var(--navy);">ABUY ADMIN</div>
+    <div class="nav-links">
+        <a href="admin-menu.html">Kelola Menu</a>
+        <button onclick="logoutAdmin()" style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Logout</button>
     </div>
-    <script type="module" src="js/admin-pesanan.js"></script>
+</nav>
+
+<div class="container">
+    <h2>Daftar Pesanan Masuk</h2>
+    <div id="admin-order-list">
+        <p style="text-align: center; color: #999; margin-top: 50px;">Memuat data pesanan...</p>
+    </div>
+</div>
+
+<script type="module" src="js/admin-pesanan.js"></script>
 </body>
 </html>

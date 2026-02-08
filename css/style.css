@@ -1,61 +1,267 @@
+/* FILE: css/style.css
+   THEME: Abuy Sayur (Navy, Light Blue, Green)
+   RESPONSIVE: Mobile Friendly (2 Columns)
+*/
+
 :root {
-    --primary-dark: #1a4a7a;
-    --primary-light: #4a90e2;
-    --accent-green: #7dbf21;
+    --primary-dark: #1a4a7a;    /* Biru Navy Logo */
+    --primary-light: #4a90e2;   /* Biru Muda Logo */
+    --accent-green: #7dbf21;    /* Hijau Daun */
     --bg-light: #f4f7f9;
     --text-dark: #2c3e50;
     --white: #ffffff;
     --danger: #e74c3c;
 }
 
-* { box-sizing: border-box; }
-body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg-light); color: var(--text-dark); }
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent;
+}
 
-/* Navigation */
+body { 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    margin: 0; 
+    background: var(--bg-light); 
+    color: var(--text-dark); 
+    line-height: 1.6;
+}
+
+/* --- Navigation --- */
 nav {
-    background: var(--white); padding: 10px 15px; display: flex;
-    justify-content: space-between; align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-bottom: 3px solid var(--primary-dark);
+    background: var(--white);
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-bottom: 3px solid var(--primary-dark);
     position: sticky; top: 0; z-index: 1000;
 }
-.logo-container { display: flex; align-items: center; gap: 8px; }
-.logo-container img { height: 40px; width: 40px; border-radius: 50%; object-fit: cover; }
-.logo-text { font-weight: 800; font-size: 1.1rem; color: var(--primary-dark); }
 
-/* Responsive Grid */
+.logo-container { display: flex; align-items: center; gap: 10px; }
+.logo-container img { height: 45px; width: 45px; border-radius: 50%; object-fit: cover; }
+.logo-text { font-weight: 800; font-size: 1.1rem; color: var(--primary-dark); letter-spacing: 0.5px; }
+
+.nav-links { display: flex; align-items: center; gap: 15px; }
+.nav-links span { cursor: pointer; font-weight: bold; color: var(--primary-dark); font-size: 1.1rem; }
+
+/* --- Container & Search --- */
 .container { padding: 15px; max-width: 1100px; margin: auto; }
-.grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
+
+.search-box { margin-bottom: 20px; }
+.search-box input {
+    width: 100%; padding: 12px 20px; border-radius: 25px;
+    border: 2px solid var(--primary-light); font-size: 1rem; outline: none;
+    transition: 0.3s;
+}
+.search-box input:focus { border-color: var(--accent-green); box-shadow: 0 0 8px rgba(125,191,33,0.2); }
+
+/* --- Responsive Grid --- */
+.grid-container { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); /* Default 2 Kolom di HP */
+    gap: 12px; 
+    margin-top: 10px;
+}
 
 @media (min-width: 768px) {
     .grid-container { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
     .logo-text { font-size: 1.4rem; }
+    .container { padding: 30px 5%; }
 }
 
-/* Card Produk */
-.card { background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border-bottom: 3px solid var(--primary-light); }
+/* --- Card Design --- */
+.card { 
+    background: var(--white); 
+    border-radius: 15px; 
+    overflow: hidden; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+    border-bottom: 4px solid var(--primary-light);
+    display: flex; flex-direction: column;
+    transition: 0.3s;
+}
+.card:active { transform: scale(0.97); } /* Efek tekan di HP */
 .card img { width: 100%; height: 140px; object-fit: cover; }
-.card-content { padding: 10px; text-align: center; }
-.card h4 { margin: 5px 0; font-size: 0.95rem; color: var(--primary-dark); }
-.card p { color: var(--accent-green); font-weight: 800; font-size: 1rem; margin: 5px 0; }
+.card-content { padding: 12px; text-align: center; flex-grow: 1; }
+.card h4 { margin: 5px 0; font-size: 0.95rem; color: var(--primary-dark); height: 2.5em; overflow: hidden; }
+.card p { color: var(--accent-green); font-weight: 800; font-size: 1.1rem; margin: 8px 0; }
+.card-content span {
+    font-weight: normal;
+    color: #888;
+}
 
-/* Buttons */
-button { background: var(--accent-green); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
-button:hover { opacity: 0.9; }
+/* --- Buttons --- */
+button { 
+    background: var(--accent-green); color: white; border: none; 
+    padding: 10px; border-radius: 10px; font-weight: bold; 
+    cursor: pointer; transition: 0.3s; width: 100%;
+}
+button:hover { filter: brightness(0.9); }
 .btn-danger { background: var(--danger); }
+.btn-admin { background: var(--primary-dark); color: white !important; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; }
 
-/* Search Box */
-.search-box input { width: 100%; padding: 12px 20px; border-radius: 25px; border: 2px solid var(--primary-light); outline: none; }
-
-/* Modal Cart (Slide Up for Mobile) */
+/* --- Estetik Cart Modal --- */
 #cart-modal {
-    position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 20px;
-    border-radius: 20px 20px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); z-index: 2000;
-}
-@media (min-width: 768px) {
-    #cart-modal { top: 50%; bottom: auto; left: 50%; transform: translate(-50%, -50%); width: 400px; border-radius: 15px; }
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; padding: 25px; 
+    border-radius: 25px 25px 0 0; 
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 2000;
 }
 
-/* Login Page */
-.login-body { background: linear-gradient(135deg, var(--primary-dark), var(--primary-light)); height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.login-card { background: white; width: 100%; max-width: 380px; padding: 30px; border-radius: 20px; text-align: center; }
-.login-card input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; }
+@media (min-width: 768px) {
+    #cart-modal { 
+        top: 50%; bottom: auto; left: 50%; transform: translate(-50%, -50%); 
+        width: 450px; border-radius: 20px; 
+    }
+}
+
+/* --- Estetik Area Catatan --- */
+.note-label {
+    display: block; margin-top: 15px; font-size: 0.85rem;
+    font-weight: bold; color: var(--primary-dark);
+}
+
+#order-note {
+    width: 100%; height: 80px; margin-top: 8px; padding: 12px;
+    border: 2px dashed var(--primary-light); /* Efek estetik dashed */
+    border-radius: 12px; background-color: #f9fbff;
+    font-family: inherit; font-size: 0.9rem; color: var(--text-dark);
+    resize: none; outline: none; transition: 0.3s;
+}
+
+#order-note:focus {
+    border-color: var(--accent-green);
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(125, 191, 33, 0.1);
+}
+
+/* --- Login Page --- */
+.login-body {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+    height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.login-card {
+    background: white; width: 100%; max-width: 380px; 
+    padding: 40px 30px; border-radius: 25px; 
+    text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+.login-card input {
+    width: 100%; padding: 12px; margin-bottom: 12px; 
+    border-radius: 10px; border: 1.5px solid #eee; outline: none;
+}
+.login-card input:focus { border-color: var(--primary-light); }
+/* Layout Admin Kelola Menu Modern */
+.admin-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1300px;
+    margin: auto;
+}
+
+.admin-form-section { flex: 1; min-width: 300px; }
+.admin-table-section { flex: 2; min-width: 500px; }
+
+.card-admin {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+}
+
+.card-admin h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #333;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+}
+
+#menu-form label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: #666; }
+#menu-form input, #menu-form select {
+    width: 100%; padding: 10px; margin-bottom: 15px;
+    border: 1px solid #ddd; border-radius: 6px; outline: none;
+}
+
+.btn-primary-admin {
+    background: #007bff; color: white; border: none;
+    width: 100%; padding: 12px; border-radius: 6px;
+    font-weight: bold; cursor: pointer; transition: 0.3s;
+}
+.btn-primary-admin:hover { background: #0056b3; }
+
+/* Styled Table */
+.table-responsive { overflow-x: auto; }
+.styled-table { width: 100%; border-collapse: collapse; }
+.styled-table thead tr { background-color: #f8f9fa; border-bottom: 2px solid #eee; }
+.styled-table th { padding: 12px; text-align: left; font-size: 0.85rem; color: #555; }
+.styled-table td { padding: 10px; border-bottom: 1px solid #f1f1f1; vertical-align: middle; }
+
+.img-table { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+.menu-name { font-weight: bold; display: block; color: #333; }
+.menu-cat { font-size: 0.75rem; color: #999; }
+
+.btn-delete-table {
+    background: #ffeded; color: #ff4d4d; border: none;
+    padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: 0.3s;
+}
+.btn-delete-table:hover { background: #ff4d4d; color: white; }
+
+@media (max-width: 800px) { .admin-container { flex-direction: column; } }
+/* Gaya Tombol Status Stok */
+.btn-status {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    min-width: 80px;
+}
+
+.stok-ada {
+    background-color: #d4edda;
+    color: #155724; /* Hijau seperti 'Tersedia' */
+    border: 1px solid #c3e6cb;
+}
+
+.stok-ada:hover {
+    background-color: #c3e6cb;
+}
+
+.stok-habis {
+    background-color: #f8d7da;
+    color: #721c24; /* Merah seperti 'Set Habis' */
+    border: 1px solid #f5c6cb;
+}
+
+.stok-habis:hover {
+    background-color: #f5c6cb;
+}
+
+/* Penyesuaian Tabel Admin */
+.styled-table th {
+    text-align: left;
+    background: #f8f9fa;
+    color: #333;
+}
+/* Gaya Produk Habis */
+.card.habis { opacity: 0.6; filter: grayscale(0.5); }
+.badge-habis {
+    background: #ff4d4d; color: white; padding: 5px 10px;
+    border-radius: 5px; font-size: 0.7rem; font-weight: bold;
+    position: absolute; top: 10px; right: 10px; z-index: 5;
+}
+.btn-habis { background: #ccc !important; color: #777 !important; cursor: not-allowed; }
+
+/* Modal Keranjang Supaya Bisa Di-klik */
+#cart-modal {
+    display: none; position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); width: 90%; max-width: 400px;
+    background: white; z-index: 9999; padding: 20px;
+    border-radius: 15px; box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+}
+.cart-icon { cursor: pointer; position: relative; z-index: 1000; }

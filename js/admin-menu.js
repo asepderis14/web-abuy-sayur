@@ -1,51 +1,106 @@
-import { db, auth } from './firebase-config.js';
-import { collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import './auth-check.js';
+import { db } from './firebase-config.js';
+import { collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const form = document.getElementById('menu-form');
+const menuForm = document.getElementById('menu-form');
+const menuTableBody = document.getElementById('menu-table-body');
 
-form.addEventListener('submit', async (e) => {
+// 1. FUNGSI MENAMBAH MENU BARU
+menuForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn = document.getElementById('btn-save');
-    btn.disabled = true; btn.innerText = "Uploading...";
 
-    const file = document.getElementById('image').files[0];
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'preset_toko'); // GANTI INI
+    const name = document.getElementById('name').value;
+    const price = Number(document.getElementById('price').value);
+    const category = document.getElementById('category').value;
+    const unit = document.getElementById('unit').value;
+    const fileInput = document.getElementById('file-input');
 
-    const res = await fetch('https://api.cloudinary.com/v1_1/dxoldybca/image/upload', { // GANTI INI
-        method: 'POST', body: formData
-    });
-    const imgData = await res.json();
+    // Karena kita tidak pakai Firebase Storage (untuk simpelnya), 
+    // kita ubah gambar jadi URL Base64 agar bisa disimpan langsung di Firestore
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-    await addDoc(collection(db, "menus"), {
-        name: document.getElementById('name').value,
-        price: Number(document.getElementById('price').value),
-        image: imgData.secure_url,
-        createdAt: new Date()
-    });
+    reader.onload = async () => {
+        const base64Image = reader.result;
 
-    alert("Berhasil!"); form.reset();
-    btn.disabled = false; btn.innerText = "Simpan ke Database";
+        try {
+            await addDoc(collection(db, "menus"), {
+                name: name,
+                price: price,
+                category: category,
+                unit: unit,
+                image: base64Image,
+                status: "Tersedia", // Status default saat baru ditambah
+                createdAt: serverTimestamp()
+            });
+
+            alert("Menu Berhasil Ditambahkan!");
+            menuForm.reset();
+        } catch (error) {
+            console.error("Gagal menambah menu: ", error);
+            alert("Terjadi kesalahan saat menyimpan ke Database.");
+        }
+    };
+
+    if (file) {
+        reader.readAsDataURL(file);
+    } else {
+        alert("Silakan pilih foto menu terlebih dahulu!");
+    }
 });
 
-onSnapshot(query(collection(db, "menus"), orderBy("createdAt", "desc")), (snap) => {
-    const list = document.getElementById('menu-list');
-    list.innerHTML = "";
-    snap.forEach(d => {
-        const item = d.data();
-        list.innerHTML += `
-            <div class="card">
-                <img src="${item.image}">
-                <div class="card-content">
-                    <h4>${item.name}</h4>
-                    <p style="color:var(--primary); font-weight:bold">Rp ${item.price.toLocaleString()}</p>
-                    <button class="btn-danger" onclick="hapus('${d.id}')">Hapus</button>
-                </div>
-            </div>`;
+// 2. FUNGSI MENAMPILKAN DAFTAR MENU (REAL-TIME)
+onSnapshot(collection(db, "menus"), (snapshot) => {
+    menuTableBody.innerHTML = "";
+    snapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        const id = docSnap.id;
+        const isHabis = item.status === "Habis";
+
+        menuTableBody.innerHTML += `
+            <tr>
+                <td><img src="${item.image}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;"></td>
+                <td>
+                    <strong>${item.name}</strong><br>
+                    <small style="color:#888">${item.category}</small>
+                </td>
+                <td>Rp ${Number(item.price).toLocaleString('id-ID')} / ${item.unit}</td>
+                <td style="text-align:center;">
+                    <span style="padding:4px 8px; border-radius:5px; font-size:0.75rem; background:${isHabis ? '#ff7675' : '#00b894'}; color:white;">
+                        ${item.status}
+                    </span>
+                </td>
+                <td style="text-align:center;">
+                    <div style="display:flex; gap:5px; justify-content:center;">
+                        <button onclick="toggleStok('${id}', '${item.status}')" style="background:#f1c40f; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; color:white;">
+                            <i class="fa fa-sync"></i> Set ${isHabis ? 'Tersedia' : 'Habis'}
+                        </button>
+                        <button onclick="hapusMenu('${id}')" style="background:#e74c3c; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; color:white;">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
     });
 });
-window.hapus = async (id) => { if(confirm("Hapus?")) await deleteDoc(doc(db, "menus", id)); };
-document.getElementById('logout').onclick = () => signOut(auth).then(() => location.href="login.html");
+
+// 3. FUNGSI UBAH STATUS STOK
+window.toggleStok = async (id, currentStatus) => {
+    const newStatus = currentStatus === "Tersedia" ? "Habis" : "Tersedia";
+    try {
+        await updateDoc(doc(db, "menus", id), { status: newStatus });
+    } catch (error) {
+        alert("Gagal memperbarui status.");
+    }
+};
+
+// 4. FUNGSI HAPUS MENU
+window.hapusMenu = async (id) => {
+    if (confirm("Apakah Anda yakin ingin menghapus menu ini?")) {
+        try {
+            await deleteDoc(doc(db, "menus", id));
+        } catch (error) {
+            alert("Gagal menghapus menu.");
+        }
+    }
+};
