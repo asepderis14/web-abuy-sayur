@@ -17,6 +17,12 @@ menuForm.addEventListener('submit', async (e) => {
     // Karena kita tidak pakai Firebase Storage (untuk simpelnya), 
     // kita ubah gambar jadi URL Base64 agar bisa disimpan langsung di Firestore
     const file = fileInput.files[0];
+    
+    if (!file) {
+        alert("Silakan pilih foto menu terlebih dahulu!");
+        return;
+    }
+
     const reader = new FileReader();
 
     reader.onload = async () => {
@@ -37,20 +43,32 @@ menuForm.addEventListener('submit', async (e) => {
             menuForm.reset();
         } catch (error) {
             console.error("Gagal menambah menu: ", error);
-            alert("Terjadi kesalahan saat menyimpan ke Database.");
+            alert("Terjadi kesalahan saat menyimpan ke Database: " + error.message);
         }
     };
 
-    if (file) {
-        reader.readAsDataURL(file);
-    } else {
-        alert("Silakan pilih foto menu terlebih dahulu!");
-    }
+    reader.onerror = () => {
+        alert("Gagal membaca file gambar!");
+    };
+
+    reader.readAsDataURL(file);
 });
 
 // 2. FUNGSI MENAMPILKAN DAFTAR MENU (REAL-TIME)
 onSnapshot(collection(db, "menus"), (snapshot) => {
     menuTableBody.innerHTML = "";
+    
+    if (snapshot.empty) {
+        menuTableBody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center; padding:20px;">
+                    Belum ada menu. Silakan tambahkan menu baru.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
     snapshot.forEach((docSnap) => {
         const item = docSnap.data();
         const id = docSnap.id;
@@ -58,7 +76,7 @@ onSnapshot(collection(db, "menus"), (snapshot) => {
 
         menuTableBody.innerHTML += `
             <tr>
-                <td><img src="${item.image}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;"></td>
+                <td><img src="${item.image || 'logo.png'}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;"></td>
                 <td>
                     <strong>${item.name}</strong><br>
                     <small style="color:#888">${item.category}</small>
@@ -82,6 +100,15 @@ onSnapshot(collection(db, "menus"), (snapshot) => {
             </tr>
         `;
     });
+}, (error) => {
+    console.error("Error membaca data:", error);
+    menuTableBody.innerHTML = `
+        <tr>
+            <td colspan="5" style="text-align:center; padding:20px; color:red;">
+                Gagal memuat data. Error: ${error.message}
+            </td>
+        </tr>
+    `;
 });
 
 // 3. FUNGSI UBAH STATUS STOK
@@ -90,7 +117,7 @@ window.toggleStok = async (id, currentStatus) => {
     try {
         await updateDoc(doc(db, "menus", id), { status: newStatus });
     } catch (error) {
-        alert("Gagal memperbarui status.");
+        alert("Gagal memperbarui status: " + error.message);
     }
 };
 
@@ -100,7 +127,7 @@ window.hapusMenu = async (id) => {
         try {
             await deleteDoc(doc(db, "menus", id));
         } catch (error) {
-            alert("Gagal menghapus menu.");
+            alert("Gagal menghapus menu: " + error.message);
         }
     }
 };

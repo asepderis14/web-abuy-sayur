@@ -60,8 +60,8 @@
                         <option value="Perikanan">Perikanan</option>
                         <option value="Perdagingan">Perdagingan</option>
                         <option value="Perbumbuan">Perbumbuan</option>
-                        <option value="Peremihan">Peremihan</option>
-                        <option value="Kurupuk">Kurupuk</option>
+                        <option value="Peremihan">Permiean</option>
+                        <option value="Kurupuk">Kerupuk</option>
                         <option value="Bahan Pokok">Bahan Pokok</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
@@ -71,6 +71,9 @@
                     
                     <button type="submit" id="btn-save" class="btn-primary-admin">
                         <i class="fa fa-cloud-upload-alt"></i> Simpan ke Database
+                    </button>
+                    <button onclick="logoutAdmin()" style="background:#e74c3c; color:white; border:none; padding:5px 15px; border-radius:5px; cursor:pointer;">
+                        <i class="fa fa-sign-out-alt"></i> Keluar
                     </button>
                 </form>
             </div>
@@ -98,6 +101,8 @@
         </div>
     </div>
 
+    <script type="module" src="js/auth-check.js"></script>
+    <!-- DIPERBAIKI: admin-pesanan.js diganti dengan admin-menu.js -->
     <script type="module" src="js/admin-menu.js"></script>
 </body>
 </html>

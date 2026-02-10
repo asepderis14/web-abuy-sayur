@@ -11,7 +11,7 @@ const firebaseConfig = {
     storageBucket: "toko-online-saya-9b69b.firebasestorage.app",
     messagingSenderId: "1027876534694",
     appId: "1:1027876534694:web:9e70b933cb8c3e22b9b767"
-  };
+};
 
 // Inisialisasi Firebase
 const app = initializeApp(firebaseConfig);

@@ -19,22 +19,41 @@
         <a href="index.html" style="text-decoration:none; color:#888; font-size:0.8rem; display:block; margin-top:15px;">← Kembali ke Toko</a>
     </div>
 
-    <script type="module">
-        import { auth } from './js/firebase-config.js';
-        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+<script type="module">
+    import { auth } from './js/firebase-config.js';
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        document.getElementById('login-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-login');
-            btn.innerText = "Processing...";
-            try {
-                await signInWithEmailAndPassword(auth, email.value, password.value);
-                location.href = 'admin-menu.html';
-            } catch (err) {
-                document.getElementById('error-msg').innerText = "Login Gagal!";
-                btn.innerText = "Masuk";
+    const loginForm = document.getElementById('login-form');
+    const errorMsg = document.getElementById('error-msg');
+    const btnLogin = document.getElementById('btn-login');
+
+    loginForm.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        btnLogin.innerText = "Memverifikasi...";
+        btnLogin.disabled = true;
+        errorMsg.innerText = "";
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            // Jika sukses, pindah ke dashboard admin
+            window.location.href = 'admin-pesanan.html';
+        } catch (error) {
+            btnLogin.innerText = "Masuk";
+            btnLogin.disabled = false;
+            
+            // Pesan error ramah pengguna
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                errorMsg.innerText = "Email atau Password salah!";
+            } else {
+                errorMsg.innerText = "Gagal masuk. Pastikan akun sudah dibuat di Firebase.";
             }
-        };
-    </script>
+            console.error(error.message);
+        }
+    };
+</script>
 </body>
 </html>

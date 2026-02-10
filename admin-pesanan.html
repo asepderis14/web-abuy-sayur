@@ -37,7 +37,9 @@
     <div style="font-weight: bold; font-size: 1.2rem; color: var(--navy);">ABUY ADMIN</div>
     <div class="nav-links">
         <a href="admin-menu.html">Kelola Menu</a>
-        <button onclick="logoutAdmin()" style="background:var(--red); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Logout</button>
+        <button onclick="logoutAdmin()" style="background:#e74c3c; color:white; border:none; padding:5px 15px; border-radius:5px; cursor:pointer;">
+    <i class="fa fa-sign-out-alt"></i> Keluar
+</button>
     </div>
 </nav>
 
@@ -47,6 +49,8 @@
         <p style="text-align: center; color: #999; margin-top: 50px;">Memuat data pesanan...</p>
     </div>
 </div>
+
+<script type="module" src="js/auth-check.js"></script>
 
 <script type="module" src="js/admin-pesanan.js"></script>
 </body>

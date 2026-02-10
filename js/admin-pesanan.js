@@ -1,9 +1,30 @@
 import { db } from './firebase-config.js';
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Load library jspdf & autotable secara otomatis untuk fitur PDF
-const s1 = document.createElement('script'); s1.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"; document.head.appendChild(s1);
-const s2 = document.createElement('script'); s2.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"; document.head.appendChild(s2);
+// Load library jspdf & autotable
+let jsPDFReady = false;
+const loadJsPDF = () => {
+    return new Promise((resolve, reject) => {
+        if (window.jspdf && window.jspdf.jsPDF) {
+            resolve();
+        } else {
+            const s1 = document.createElement('script');
+            s1.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+            s1.onload = () => {
+                const s2 = document.createElement('script');
+                s2.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js";
+                s2.onload = () => {
+                    jsPDFReady = true;
+                    resolve();
+                };
+                s2.onerror = reject;
+                document.head.appendChild(s2);
+            };
+            s1.onerror = reject;
+            document.head.appendChild(s1);
+        }
+    });
+};
 
 const orderList = document.getElementById('admin-order-list');
 
@@ -65,46 +86,67 @@ onSnapshot(query(collection(db, "orders"), orderBy("createdAt", "desc")), (snap)
 });
 
 // FUNGSI EXPORT PDF (FORMAT STRUK)
-window.downloadPDF = (data, tanggal) => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+window.downloadPDF = async (data, tanggal) => {
+    try {
+        await loadJsPDF();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-    doc.setFontSize(18);
-    doc.text("STRUK PESANAN ABUY SAYUR", 105, 15, { align: "center" });
-    doc.setFontSize(10);
-    doc.text(`Waktu: ${tanggal}`, 105, 22, { align: "center" });
-
-    doc.text(`Nama Pelanggan : ${data.customerName}`, 20, 32);
-    doc.text(`Alamat         : ${data.address}`, 20, 38);
-
-    const tableBody = data.items.map(i => [
-        i.name,
-        `${i.qty} x ${i.unit}`, // Format 'x' di dalam PDF
-        `Rp ${i.price.toLocaleString('id-ID')}`,
-        `Rp ${(i.price * i.qty).toLocaleString('id-ID')}`
-    ]);
-
-    doc.autoTable({
-        startY: 45,
-        head: [['Produk', 'jumlah', 'Harga satuan', 'Subtotal']],
-        body: tableBody,
-        theme: 'grid',
-        headStyles: { fillColor: [0, 51, 102] }
-    });
-
-    const finalY = doc.lastAutoTable.finalY + 10;
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text(`TOTAL BAYAR: Rp ${data.total.toLocaleString('id-ID')}`, 20, finalY);
-    
-    if (data.note) {
+        doc.setFontSize(18);
+        doc.text("STRUK PESANAN ABUY SAYUR", 105, 15, { align: "center" });
         doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Catatan: ${data.note}`, 20, finalY + 10);
-    }
+        doc.text(`Waktu: ${tanggal}`, 105, 22, { align: "center" });
 
-    doc.save(`Struk_Abuy_${data.customerName}.pdf`);
+        doc.text(`Nama Pelanggan : ${data.customerName}`, 20, 32);
+        doc.text(`Alamat         : ${data.address}`, 20, 38);
+
+        const tableBody = data.items.map(i => [
+            i.name,
+            `${i.qty} x ${i.unit}`,
+            `Rp ${i.price.toLocaleString('id-ID')}`,
+            `Rp ${(i.price * i.qty).toLocaleString('id-ID')}`
+        ]);
+
+        doc.autoTable({
+            startY: 45,
+            head: [['Produk', 'Jumlah', 'Harga satuan', 'Subtotal']],
+            body: tableBody,
+            theme: 'grid',
+            headStyles: { fillColor: [0, 51, 102] }
+        });
+
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text(`TOTAL BAYAR: Rp ${data.total.toLocaleString('id-ID')}`, 20, finalY);
+        
+        if (data.note) {
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Catatan: ${data.note}`, 20, finalY + 10);
+        }
+
+        doc.save(`Struk_Abuy_${data.customerName}.pdf`);
+    } catch (error) {
+        console.error('Gagal membuat PDF:', error);
+        alert('Gagal membuat PDF. Pastikan koneksi internet stabil.');
+    }
 };
 
-window.updateStatus = async (id, s) => { await updateDoc(doc(db, "orders", id), { status: s }); };
-window.delOrder = async (id) => { if(confirm("Hapus pesanan ini?")) await deleteDoc(doc(db, "orders", id)); };
+window.updateStatus = async (id, s) => { 
+    try {
+        await updateDoc(doc(db, "orders", id), { status: s });
+    } catch (error) {
+        alert("Gagal memperbarui status: " + error.message);
+    }
+};
+
+window.delOrder = async (id) => { 
+    if(confirm("Hapus pesanan ini?")) {
+        try {
+            await deleteDoc(doc(db, "orders", id));
+        } catch (error) {
+            alert("Gagal menghapus pesanan: " + error.message);
+        }
+    }
+};
