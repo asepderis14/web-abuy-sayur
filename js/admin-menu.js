@@ -3,8 +3,73 @@ import { collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, serverTimest
 
 const menuForm = document.getElementById('menu-form');
 const menuTableBody = document.getElementById('menu-table-body');
+const btnSave = document.getElementById('btn-save');
 
-// 1. FUNGSI MENAMBAH MENU BARU
+/**
+ * Fungsi kompresi gambar menggunakan Canvas
+ * @param {File} file - File gambar yang dipilih user
+ * @param {number} maxSizeMB - Ukuran maksimal dalam MB (default 1 MB)
+ * @param {number} maxWidth - Lebar maksimal piksel (default 1024px)
+ * @returns {Promise<string>} - Base64 gambar yang sudah dikompresi
+ */
+function compressImage(file, maxSizeMB = 1, maxWidth = 1024) {
+    return new Promise((resolve, reject) => {
+        // Batas ukuran dalam byte
+        const maxSize = maxSizeMB * 1024 * 1024;
+        
+        // Jika file sudah di bawah maxSize dan tidak perlu kompresi? 
+        // Tetap kita kompres untuk optimasi, atau bisa lewati jika <= 1MB dan dimensi kecil.
+        // Tapi lebih baik kompres dengan kualitas sedang agar loading cepat.
+        
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                // Hitung dimensi baru dengan mempertahankan rasio aspek
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+                
+                // Buat canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Mulai dengan kualitas 0.8
+                let quality = 0.8;
+                let compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                
+                // Fungsi untuk mendapatkan ukuran base64 dalam byte (kurang lebih)
+                const getBase64Size = (base64) => {
+                    // Hapus header data:image/jpeg;base64,
+                    const base64Data = base64.split(',')[1];
+                    return Math.ceil((base64Data.length * 3) / 4); // ukuran dalam byte
+                };
+                
+                // Iterasi menurunkan kualitas hingga ukuran <= maxSize
+                while (getBase64Size(compressedBase64) > maxSize && quality > 0.1) {
+                    quality -= 0.1;
+                    compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                }
+                
+                resolve(compressedBase64);
+            };
+            img.onerror = () => reject(new Error('Gagal memuat gambar'));
+        };
+        reader.onerror = () => reject(new Error('Gagal membaca file'));
+    });
+}
+
+// 1. FUNGSI MENAMBAH MENU BARU DENGAN KOMPRESI GAMBAR
 menuForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -14,8 +79,6 @@ menuForm.addEventListener('submit', async (e) => {
     const unit = document.getElementById('unit').value;
     const fileInput = document.getElementById('file-input');
 
-    // Karena kita tidak pakai Firebase Storage (untuk simpelnya), 
-    // kita ubah gambar jadi URL Base64 agar bisa disimpan langsung di Firestore
     const file = fileInput.files[0];
     
     if (!file) {
@@ -23,35 +86,46 @@ menuForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    const reader = new FileReader();
+    // Validasi tipe file
+    if (!file.type.startsWith('image/')) {
+        alert("File harus berupa gambar!");
+        return;
+    }
 
-    reader.onload = async () => {
-        const base64Image = reader.result;
+    // Simpan teks asli tombol
+    const originalText = btnSave.innerHTML;
+    btnSave.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Mengompresi gambar...';
+    btnSave.disabled = true;
 
-        try {
-            await addDoc(collection(db, "menus"), {
-                name: name,
-                price: price,
-                category: category,
-                unit: unit,
-                image: base64Image,
-                status: "Tersedia", // Status default saat baru ditambah
-                createdAt: serverTimestamp()
-            });
+    try {
+        // Kompres gambar (target max 1 MB)
+        const compressedBase64 = await compressImage(file, 1, 1024);
+        
+        btnSave.innerHTML = '<i class="fa fa-cloud-upload-alt"></i> Menyimpan...';
+        
+        await addDoc(collection(db, "menus"), {
+            name: name,
+            price: price,
+            category: category,
+            unit: unit,
+            image: compressedBase64, // Hasil kompresi
+            status: "Tersedia",
+            createdAt: serverTimestamp()
+        });
 
-            alert("Menu Berhasil Ditambahkan!");
-            menuForm.reset();
-        } catch (error) {
-            console.error("Gagal menambah menu: ", error);
-            alert("Terjadi kesalahan saat menyimpan ke Database: " + error.message);
-        }
-    };
-
-    reader.onerror = () => {
-        alert("Gagal membaca file gambar!");
-    };
-
-    reader.readAsDataURL(file);
+        alert("✅ Menu Berhasil Ditambahkan dengan gambar terkompresi!");
+        menuForm.reset();
+        
+        // Reset file input secara manual (karena reset() tidak selalu menghapus file)
+        fileInput.value = '';
+        
+    } catch (error) {
+        console.error("Gagal menambah menu: ", error);
+        alert("❌ Terjadi kesalahan: " + error.message);
+    } finally {
+        btnSave.innerHTML = originalText;
+        btnSave.disabled = false;
+    }
 });
 
 // 2. FUNGSI MENAMPILKAN DAFTAR MENU (REAL-TIME)
